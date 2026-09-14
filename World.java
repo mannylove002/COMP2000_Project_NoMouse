@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 public class World {
-    private final double width, height;
+    public final double width, height;
     private final List<Bird> birds = new ArrayList<>();
     private final List<Obstacle> obstacles = new ArrayList<>();
     private final List<Predator> predators = new ArrayList<>();
