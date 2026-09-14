@@ -41,7 +41,7 @@ public class App {
 
             for (int i = 0; i < 100; i++) {
                 try {
-                    world.addBird(new Bird(Math.random() * 400, Math.random() * 400));
+                    world.addBird(new Bird(Math.random() * (int)world.width, Math.random() * (int)world.height));
                 } catch (IllegalArgumentException e) {
                     System.err.println("Failed to add bird " + i + ": " + e.getMessage());
                 }
@@ -59,7 +59,7 @@ public class App {
 
             //Set frame size and make it visible.
             frame.setVisible(true);
-            frame.setSize(400, 600);
+            frame.setSize((int)world.width, (int)world.height);
 
             //Add Slider to sliderPanel
             sliderPanel.add(separation);
