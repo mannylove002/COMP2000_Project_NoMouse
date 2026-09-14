@@ -34,7 +34,7 @@ public class Bird extends MovingEntity {
         cohesion.calculate(this, world);
         
         updatePosition();
-        wrapAround(world.width, world.height);
+        avoidWalls(world.width, world.height);
     }
     private void updatePosition() {
         // Acceleration changes velocity
@@ -49,11 +49,21 @@ public class Bird extends MovingEntity {
         this.ax = 0;
         this.ay = 0;
     }
-    private void wrapAround(double width, double height) {
-        if (this.x > width) this.x = 0;
-        else if (this.x < 0) this.x = width;
-        if (this.y > height) this.y = 0;
-        else if (this.y < 0) this.y = height;
+   private void avoidWalls(double width, double height) {
+        double margin = 50.0; 
+        double turnFactor = 0.5;
+        
+        if (this.x < margin) {
+            this.ax += turnFactor;
+        } else if (this.x > width - margin) {
+            this.ax -= turnFactor;
+        }
+        
+        if (this.y < margin) {
+            this.ay += turnFactor;
+        } else if (this.y > height - margin) {
+            this.ay -= turnFactor;
+        }
     }
 
     @Override
