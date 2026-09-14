@@ -4,11 +4,9 @@ import javax.swing.*;
 
 /*
 NOTES:
-    going to change GridLayout to GridBagLayout
-    make flockPanel 2/3 of frame
+    fix up sliders
     add lables to sliders
-    add use to sliders
-    create bird visule
+    add uses to sliders
     create piller visule
     make pretty if time
  */
@@ -29,11 +27,11 @@ public class App {
             // Create the predator when the simulation starts.
             world.addPredator(new Predator(200, 200));
             // Setting flockPanel paramaters
-            //flockPanel.setBounds(0, 0, 200, 200);
-            flockPanel.setBackground(Color.gray);
+            flockPanel.setBounds(0, 0, 400, 400);
+            flockPanel.setBackground(Color.blue);
             // Setting sliderPanel paramaters
-            //sliderPanel.setBounds(0, 400, 200, 200);
-            sliderPanel.setBackground(Color.blue);
+            sliderPanel.setBounds(0, 400, 400, 200);
+            sliderPanel.setBackground(Color.gray);
 
             for (int i = 0; i < 100; i++) {
                 world.addBird(new Bird(Math.random() * 400, Math.random() * 400));
@@ -47,7 +45,7 @@ public class App {
             
 
             // Set frame layout.
-            frame.setLayout(new GridLayout(2, 1, 10, 10));
+            frame.setLayout(null);
 
             //Set frame size and make it visible.
             frame.setVisible(true);
@@ -55,11 +53,21 @@ public class App {
 
             //Add Slider to sliderPanel
             sliderPanel.add(separation);
+            //separation.bounds();
             sliderPanel.add(alignment);
             sliderPanel.add(piller);
-            sliderPanel.setLayout(new GridLayout(3, 1, 5, 5));
+            //sliderPanel.setLayout(new GridLayout(3, 1, 5, 5));
 
-                // If window closes, exit the program.
+            frame.addComponentListener(new ComponentAdapter() {
+                @Override 
+                public void componentResized(ComponentEvent e) {
+                    Dimension d = e.getComponent().getSize();
+                    flockPanel.setBounds(0, 0, d.width, d.height * 2/3);
+                    sliderPanel.setBounds(0, 400, d.width, d.height / 3);
+                }
+            });
+
+            // If window closes, exit the program.
             frame.addWindowListener(
                 new WindowAdapter() {
                     @Override 
