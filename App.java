@@ -27,7 +27,11 @@ public class App {
 
         public App() {
             // Create the predator when the simulation starts.
-            world.addPredator(new Predator(200, 200));
+            try {
+                world.addPredator(new Predator(200, 200));
+            } catch (IllegalArgumentException e) {
+                System.err.println("Failed to add predator: " + e.getMessage());
+            }
             // Setting flockPanel paramaters
             //flockPanel.setBounds(0, 0, 200, 200);
             flockPanel.setBackground(Color.gray);
@@ -36,7 +40,11 @@ public class App {
             sliderPanel.setBackground(Color.blue);
 
             for (int i = 0; i < 100; i++) {
-                world.addBird(new Bird(Math.random() * 400, Math.random() * 400));
+                try {
+                    world.addBird(new Bird(Math.random() * 400, Math.random() * 400));
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Failed to add bird " + i + ": " + e.getMessage());
+                }
             }
 
             
