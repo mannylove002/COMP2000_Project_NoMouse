@@ -4,25 +4,31 @@ import java.util.List;
 
 public class Predator extends MovingEntity {
 
-    private double speed = 2.0;
-    private double size = 25.0;
+    private double speed = 1.5;
+    private double size = 20.0;
 
     public Predator(double x, double y) {
         super(x, y);
     }
 
-    public void update(List<Bird> birds) {
+    public void update(List<? extends Bird> birds) {
         Bird closestBird = findClosestBird(birds);
 
         if (closestBird != null) {
-            moveTowards(closestBird);
+            
+            if (distanceTo(closestBird) < this.size) {
+                birds.remove(closestBird);
+            } else {
+
+                moveTowards(closestBird);
+            }
         }
 
         x += dx;
         y += dy;
     }
 
-    private Bird findClosestBird(List<Bird> birds) {
+    private Bird findClosestBird(List<? extends Bird> birds) {
         Bird closestBird = null;
         double closestDistance = Double.MAX_VALUE;
         if(birds.isEmpty()) {
