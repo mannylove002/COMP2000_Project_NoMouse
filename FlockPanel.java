@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.List;
+
 import javax.swing.JPanel;
 
 public class FlockPanel extends JPanel {
@@ -12,31 +14,21 @@ public class FlockPanel extends JPanel {
         setBackground(Color.GRAY);
     }
 
+    private void renderEntities(Graphics2D g2d, List<? extends Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity != null) {
+                entity.render(g2d);
+            }
+        }
+    }
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         Graphics2D g2d = (Graphics2D) g;
 
-        // Draw all birds.
-        for (Bird bird : world.getBirds()) {
-            if (bird != null) {
-                bird.render(g2d);
-            }
-        }
-
-        // Draw all obstacles.
-        for (Obstacle obstacle : world.getObstacles()) {
-            if (obstacle != null) {
-                obstacle.render(g2d);
-            }
-        }
-
-        // Draw all predators.
-        for (Predator predator : world.getPredators()) {
-            if (predator != null) {
-                predator.render(g2d);
-            }
-        }
+        renderEntities(g2d, world.getBirds());
+        renderEntities(g2d, world.getObstacles());
+        renderEntities(g2d, world.getPredators());
     }
 }
