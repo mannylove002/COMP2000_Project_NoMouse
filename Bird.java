@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 public class Bird extends MovingEntity {
      
     private double mass = 1.0;
+    private double size = 16.0;
 
     private double ax = 0;
     private double ay = 0;
@@ -66,10 +67,25 @@ public class Bird extends MovingEntity {
         }
     }
 
-    @Override
+   @Override
     public void render(Graphics2D g2d) {
+        double theta = getHeading();
+        double cos = Math.cos(theta);
+        double sin = Math.sin(theta);
+
+        double[] px = { size * 0.5, -size * 0.4, -size * 0.1, -size * 0.4 };
+        double[] py = { 0,          -size * 0.4,  0,           size * 0.4 };
+
+        int[] xPoints = new int[4];
+        int[] yPoints = new int[4];
+
+        for (int i = 0; i < 4; i++) {
+            xPoints[i] = (int) (this.x + (px[i] * cos - py[i] * sin));
+            yPoints[i] = (int) (this.y + (px[i] * sin + py[i] * cos));
+        }
+
         g2d.setColor(Color.WHITE);
-        g2d.fillOval((int)this.x, (int)this.y, 6, 6);
+        g2d.fillPolygon(xPoints, yPoints, 4);
     }
 
 }

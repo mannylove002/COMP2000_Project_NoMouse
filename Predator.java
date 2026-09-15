@@ -4,25 +4,31 @@ import java.util.List;
 
 public class Predator extends MovingEntity {
 
-    private double speed = 2.0;
-    private int size = 16;
+    private double speed = 1.5;
+    private double size = 20.0;
 
     public Predator(double x, double y) {
         super(x, y);
     }
 
-    public void update(List<Bird> birds) {
+    public void update(List<? extends Bird> birds) {
         Bird closestBird = findClosestBird(birds);
 
         if (closestBird != null) {
-            moveTowards(closestBird);
+            
+            if (distanceTo(closestBird) < this.size) {
+                birds.remove(closestBird);
+            } else {
+
+                moveTowards(closestBird);
+            }
         }
 
         x += dx;
         y += dy;
     }
 
-    private Bird findClosestBird(List<Bird> birds) {
+    private Bird findClosestBird(List<? extends Bird> birds) {
         Bird closestBird = null;
         double closestDistance = Double.MAX_VALUE;
         if(birds.isEmpty()) {
@@ -61,16 +67,28 @@ public class Predator extends MovingEntity {
             dy = (differenceY / distance) * speed;
         }
     }
+    public double getHeading() {
+        return Math.atan2(this.dy, this.dx);
+    }
 
     @Override
     public void render(Graphics2D g2d) {
-        g2d.setColor(Color.RED);
+        double theta = getHeading();
+        double cos = Math.cos(theta);
+        double sin = Math.sin(theta);
 
-        g2d.fillOval(
-                (int) x - size / 2,
-                (int) y - size / 2,
-                size,
-                size
-        );
+        double[] px = { size * 0.5, -size * 0.4, -size * 0.1, -size * 0.4 };
+        double[] py = { 0,          -size * 0.4,  0,           size * 0.4 };
+
+        int[] xPoints = new int[4];
+        int[] yPoints = new int[4];
+
+        for (int i = 0; i < 4; i++) {
+            xPoints[i] = (int) (this.x + (px[i] * cos - py[i] * sin));
+            yPoints[i] = (int) (this.y + (px[i] * sin + py[i] * cos));
+        }
+
+        g2d.setColor(Color.RED);
+        g2d.fillPolygon(xPoints, yPoints, 4);
     }
 }
