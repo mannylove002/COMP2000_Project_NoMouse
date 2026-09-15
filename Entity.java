@@ -15,7 +15,10 @@ public abstract class Entity {
     //public abstract void update();
     public abstract void render(Graphics2D g2d);
 
-    public double distanceTo(Entity other) {
+    public double distanceTo(Entity other) throws IllegalArgumentException {
+        if (other == null) {
+            throw new IllegalArgumentException("Cannot calculate distance to a null entity.");
+        }
         double diffX = this.x - other.x;
         double diffY = this.y - other.y;
         return Math.sqrt(diffX * diffX + diffY * diffY);
