@@ -39,11 +39,16 @@ public class App {
             //sliderPanel.setBounds(0, 400, 200, 200);
             sliderPanel.setBackground(Color.blue);
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 600; i++) {
                 try {
                     world.addBird(new Bird(Math.random() * (int)world.width, Math.random() * (int)world.height));
                 } catch (IllegalArgumentException e) {
+                    
                     System.err.println("Failed to add bird " + i + ": " + e.getMessage());
+                } catch (CapacityExceededException e) {
+                    
+                    System.err.println("Stopped adding birds: " + e.getMessage());
+                    break;
                 }
             }
 
