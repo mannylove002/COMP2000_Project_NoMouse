@@ -15,8 +15,6 @@ import java.util.Random;
 public class Obstacle extends Entity {
 
     private static Random RNG = new Random();
-    private double x;
-    private double y;
     private double radius;
     private long spawnTimeMillis;
     private long lifespanMillis;
