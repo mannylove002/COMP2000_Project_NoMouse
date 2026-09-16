@@ -2,13 +2,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class Bird extends MovingEntity {
-     
     private double mass = 1.0;
     private double size = 16.0;
 
-    private double ax = 0;
-    private double ay = 0;
-    
     private static final BirdBehaviour.Separation separation = new BirdBehaviour.Separation();
     private static final BirdBehaviour.Alignment alignment = new BirdBehaviour.Alignment();
     private static final BirdBehaviour.Cohesion cohesion = new BirdBehaviour.Cohesion();
@@ -67,7 +63,7 @@ public class Bird extends MovingEntity {
         }
     }
 
-   @Override
+    @Override
     public void render(Graphics2D g2d) {
         double theta = getHeading();
         double cos = Math.cos(theta);
