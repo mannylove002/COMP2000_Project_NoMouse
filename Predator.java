@@ -2,20 +2,23 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class Predator extends MovingEntity {
 
-    private double speed = 1.5;
-    private double size = 20.0;
+    private static final double SPEED = 1.5;
+    private static final double SIZE = 20.0;
 
     public Predator(double x, double y) {
         super(x, y);
     }
 
     public void update(List<Bird> birds) {
+        Objects.requireNonNull(birds, "Bird list cannot be null");
+
         findClosestBird(birds).ifPresent(closestBird -> {
-            if (distanceTo(closestBird) < this.size) {
+            if (distanceTo(closestBird) < SIZE) {
                 birds.remove(closestBird);
             } else {
                 moveTowards(closestBird);
@@ -32,9 +35,7 @@ public class Predator extends MovingEntity {
      */
     private Optional<Bird> findClosestBird(List<Bird> birds) {
         return birds.stream()
-                .min(Comparator.comparingDouble(
-                        bird -> distanceTo(bird)
-                ));
+                .min(Comparator.comparingDouble(this::distanceTo));
     }
 
     private void moveTowards(Bird bird) {
@@ -47,8 +48,8 @@ public class Predator extends MovingEntity {
         );
 
         if (distance > 0) {
-            dx = (differenceX / distance) * speed;
-            dy = (differenceY / distance) * speed;
+            dx = (differenceX / distance) * SPEED;
+            dy = (differenceY / distance) * SPEED;
         }
     }
 
@@ -63,16 +64,16 @@ public class Predator extends MovingEntity {
         double sin = Math.sin(theta);
 
         double[] px = {
-                size * 0.5,
-                -size * 0.4,
-                -size * 0.1,
-                -size * 0.4
+                SIZE * 0.5,
+                -SIZE * 0.4,
+                -SIZE * 0.1,
+                -SIZE * 0.4
         };
         double[] py = {
                 0,
-                -size * 0.4,
+                -SIZE * 0.4,
                 0,
-                size * 0.4
+                SIZE * 0.4
         };
 
         int[] xPoints = new int[4];
