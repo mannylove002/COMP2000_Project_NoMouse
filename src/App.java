@@ -22,6 +22,9 @@ public class App {
     private final JSlider alignment = new JSlider();
     private final JSlider piller = new JSlider();
 
+    //RGB Color of background
+    private final Color bgColor = new Color(100,100,255);
+
 
         public App() {
             // Create the predator when the simulation starts.
@@ -32,7 +35,7 @@ public class App {
             }
             // Setting flockPanel paramaters
             flockPanel.setBounds(0, 0, 400, 400);
-            flockPanel.setBackground(Color.blue);
+            flockPanel.setBackground(bgColor);
             // Setting sliderPanel paramaters
             sliderPanel.setBounds(0, 400, 400, 200);
             sliderPanel.setBackground(Color.gray);
