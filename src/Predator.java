@@ -12,32 +12,46 @@ public abstract class Predator extends MovingEntity {
 
     private final double speed;
     private final double size;
+    private final BufferedImage scaledSprite;
+    private Bird target;
+    private double heading;
+    private boolean hasHeading;
+    private static final double MAX_TURN = 0.12; // radians per simulation update
+
     private static final BufferedImage SPRITE = loadSprite();
 
     protected Predator(double x, double y, double speed, double size) {
         super(x, y);
         this.speed = speed;
         this.size = size;
+        // Scale once, not from the full-resolution image on every repaint.
+        int diameter = (int) (size * 2);
+        scaledSprite = new BufferedImage(diameter, diameter, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics2D graphics = scaledSprite.createGraphics();
+        try {
+            graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            graphics.drawImage(SPRITE, 0, 0, diameter, diameter, null);
+        } finally {
+            graphics.dispose();
+        }
     }
 
     protected abstract double getDetectionRadius();
 
     public void update(List<? extends Bird> birds) {
-        // Reset velocity so predators stop after a capture or when no prey is in range.
+        // Keep a valid target instead of switching between nearby birds every frame.
+        if (target == null || !birds.contains(target)
+                || distanceTo(target) >= getDetectionRadius()) {
+            target = findClosestBird(birds);
+        }
+        if (target != null && distanceTo(target) < size) {
+            birds.remove(target);
+            target = findClosestBird(birds);
+        }
         dx = 0;
         dy = 0;
-        Bird closestBird = findClosestBird(birds);
-
-        if (closestBird != null) {
-            
-            if (distanceTo(closestBird) < this.size) {
-                birds.remove(closestBird);
-            } else {
-
-                moveTowards(closestBird);
-            }
-        }
-
+        if (target != null) moveTowards(target);
         x += dx;
         y += dy;
     }
@@ -51,28 +65,24 @@ public abstract class Predator extends MovingEntity {
     }
 
     private void moveTowards(Bird bird) {
-        
-        if (bird == null) {
-            dx = 0;
-            dy = 0;
-            return;
+        double desiredHeading = Math.atan2(bird.getY() - y, bird.getX() - x);
+        if (!hasHeading) {
+            heading = desiredHeading;
+            hasHeading = true;
+        } else {
+            // Wrap to the shortest turn across the -PI/PI boundary.
+            double turn = Math.atan2(Math.sin(desiredHeading - heading),
+                    Math.cos(desiredHeading - heading));
+            heading += Math.max(-MAX_TURN, Math.min(MAX_TURN, turn));
+            heading = Math.atan2(Math.sin(heading), Math.cos(heading));
         }
-
-        double differenceX = bird.getX() - x;
-        double differenceY = bird.getY() - y;
-
-        double distance = Math.sqrt(
-                differenceX * differenceX
-                + differenceY * differenceY
-        );
-
-        if (distance > 0) {
-            dx = (differenceX / distance) * speed;
-            dy = (differenceY / distance) * speed;
-        }
+        dx = Math.cos(heading) * speed;
+        dy = Math.sin(heading) * speed;
     }
+
     public double getHeading() {
-        return Math.atan2(this.dy, this.dx);
+        // Preserve the last direction while waiting, instead of snapping to zero.
+        return heading;
     }
 
     private static BufferedImage loadSprite() {
@@ -104,8 +114,7 @@ public abstract class Predator extends MovingEntity {
             // The source wolf faces left; rotate its snout toward its movement.
             spriteGraphics.rotate(getHeading() - Math.PI);
             int diameter = (int) (size * 2);
-            spriteGraphics.drawImage(SPRITE, -diameter / 2, -diameter / 2,
-                    diameter, diameter, null);
+            spriteGraphics.drawImage(scaledSprite, -diameter / 2, -diameter / 2, null);
         } finally {
             spriteGraphics.dispose();
         }
