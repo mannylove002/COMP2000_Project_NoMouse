@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.List;
+import java.util.Comparator;
 
 public abstract class Predator extends MovingEntity {
 
@@ -38,21 +39,11 @@ public abstract class Predator extends MovingEntity {
     }
 
     private Bird findClosestBird(List<? extends Bird> birds) {
-        Bird closestBird = null;
-        double closestDistance = getDetectionRadius();
-        if(birds.isEmpty()) {
-            return null;
-        }
-        for (Bird bird : birds) {
-            double distance = distanceTo(bird);
-
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestBird = bird;
-            }
-        }
-
-        return closestBird;
+        // Filter prey by detection range, then select the nearest bird.
+        return birds.stream()
+                .filter(bird -> distanceTo(bird) < getDetectionRadius())
+                .min(Comparator.comparingDouble(bird -> distanceTo(bird)))
+                .orElse(null);
     }
 
     private void moveTowards(Bird bird) {
