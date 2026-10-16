@@ -1,4 +1,9 @@
-import java.awt.Color;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.util.List;
 import java.util.Comparator;
@@ -7,13 +12,12 @@ public abstract class Predator extends MovingEntity {
 
     private final double speed;
     private final double size;
-    private final Color color;
+    private static final BufferedImage SPRITE = loadSprite();
 
-    protected Predator(double x, double y, double speed, double size, Color color) {
+    protected Predator(double x, double y, double speed, double size) {
         super(x, y);
         this.speed = speed;
         this.size = size;
-        this.color = color;
     }
 
     protected abstract double getDetectionRadius();
@@ -71,24 +75,39 @@ public abstract class Predator extends MovingEntity {
         return Math.atan2(this.dy, this.dx);
     }
 
+    private static BufferedImage loadSprite() {
+        // IDEs can copy assets onto the classpath; plain javac leaves them in src.
+        URL resource = Predator.class.getResource("/assets/predator-wolf.png");
+        try {
+            if (resource == null) {
+                Path classes = Path.of(Predator.class.getProtectionDomain()
+                        .getCodeSource().getLocation().toURI());
+                resource = classes.resolveSibling("src").resolve("assets/predator-wolf.png")
+                        .toUri().toURL();
+            }
+            BufferedImage sprite = ImageIO.read(resource);
+            if (sprite == null) throw new IOException("Unsupported predator sprite image");
+            return sprite;
+        } catch (Exception e) {
+            throw new IllegalStateException("Cannot load assets/predator-wolf.png", e);
+        }
+    }
+
     @Override
     public void render(Graphics2D g2d) {
-        double theta = getHeading();
-        double cos = Math.cos(theta);
-        double sin = Math.sin(theta);
-
-        double[] px = { size * 0.5, -size * 0.4, -size * 0.1, -size * 0.4 };
-        double[] py = { 0,          -size * 0.4,  0,           size * 0.4 };
-
-        int[] xPoints = new int[4];
-        int[] yPoints = new int[4];
-
-        for (int i = 0; i < 4; i++) {
-            xPoints[i] = (int) (this.x + (px[i] * cos - py[i] * sin));
-            yPoints[i] = (int) (this.y + (px[i] * sin + py[i] * cos));
+        // Work on a copy so the predator cannot change the world's drawing state.
+        Graphics2D spriteGraphics = (Graphics2D) g2d.create();
+        try {
+            spriteGraphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            spriteGraphics.translate(x, y);
+            // The source wolf faces left; rotate its snout toward its movement.
+            spriteGraphics.rotate(getHeading() - Math.PI);
+            int diameter = (int) (size * 2);
+            spriteGraphics.drawImage(SPRITE, -diameter / 2, -diameter / 2,
+                    diameter, diameter, null);
+        } finally {
+            spriteGraphics.dispose();
         }
-
-        g2d.setColor(color);
-        g2d.fillPolygon(xPoints, yPoints, 4);
     }
 }

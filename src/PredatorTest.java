@@ -55,13 +55,28 @@ public class PredatorTest {
         check(world.getBirds().isEmpty(), "Shared prey must be safely removed during world updates");
         world.update();
 
-        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = image.createGraphics();
-        new ChaserPredator(25, 25).render(graphics);
-        new AmbushPredator(75, 75).render(graphics);
-        graphics.dispose();
-        check(image.getRGB(25, 25) == Color.RED.getRGB(), "Chaser must render red");
-        check(image.getRGB(75, 75) == Color.ORANGE.getRGB(), "Ambush must render orange");
-        System.out.println("Predator behaviour checks passed.");
+        for (Predator predator : new Predator[] {
+                new ChaserPredator(50, 50), new AmbushPredator(50, 50)}) {
+            BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics = image.createGraphics();
+            graphics.setColor(Color.BLUE);
+            graphics.fillRect(0, 0, 100, 100);
+            java.awt.geom.AffineTransform transform = graphics.getTransform();
+            predator.render(graphics);
+            check(graphics.getTransform().equals(transform), "Rendering must preserve transform");
+            check(graphics.getColor().equals(Color.BLUE), "Rendering must preserve drawing colour");
+            graphics.dispose();
+            check(image.getRGB(0, 0) == Color.BLUE.getRGB(), "Background must stay unchanged");
+            int drawnPixels = 0;
+            for (int y = 0; y < 100; y++) {
+                for (int x = 0; x < 100; x++) {
+                    if (image.getRGB(x, y) != Color.BLUE.getRGB()) drawnPixels++;
+                }
+            }
+            check(drawnPixels > 100, "Both predators must draw their wolf sprite");
+            check(image.getRGB(31, 31) == Color.BLUE.getRGB(),
+                    "Transparent sprite corners must preserve the background");
+        }
+        System.out.println("Predator behaviour and sprite checks passed.");
     }
 }
