@@ -27,9 +27,10 @@ public class App {
 
 
         public App() {
-            // Create the predator when the simulation starts.
+            // Create both predator types when the simulation starts.
             try {
-                world.addPredator(new Predator(200, 200));
+                world.addPredator(new ChaserPredator(200, 200));
+                world.addPredator(new AmbushPredator(350, 250));
             } catch (IllegalArgumentException e) {
                 System.err.println("Failed to add predator: " + e.getMessage());
             }

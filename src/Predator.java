@@ -2,16 +2,25 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.List;
 
-public class Predator extends MovingEntity {
+public abstract class Predator extends MovingEntity {
 
-    private double speed = 1.5;
-    private double size = 20.0;
+    private final double speed;
+    private final double size;
+    private final Color color;
 
-    public Predator(double x, double y) {
+    protected Predator(double x, double y, double speed, double size, Color color) {
         super(x, y);
+        this.speed = speed;
+        this.size = size;
+        this.color = color;
     }
 
+    protected abstract double getDetectionRadius();
+
     public void update(List<? extends Bird> birds) {
+        // Reset velocity so predators stop after a capture or when no prey is in range.
+        dx = 0;
+        dy = 0;
         Bird closestBird = findClosestBird(birds);
 
         if (closestBird != null) {
@@ -30,7 +39,7 @@ public class Predator extends MovingEntity {
 
     private Bird findClosestBird(List<? extends Bird> birds) {
         Bird closestBird = null;
-        double closestDistance = Double.MAX_VALUE;
+        double closestDistance = getDetectionRadius();
         if(birds.isEmpty()) {
             return null;
         }
@@ -88,7 +97,7 @@ public class Predator extends MovingEntity {
             yPoints[i] = (int) (this.y + (px[i] * sin + py[i] * cos));
         }
 
-        g2d.setColor(Color.RED);
+        g2d.setColor(color);
         g2d.fillPolygon(xPoints, yPoints, 4);
     }
 }
